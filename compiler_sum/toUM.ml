@@ -119,7 +119,10 @@ and print_um_args ags =
 and print_um_stat p =
   match p with
   ASTEcho p -> (
-    fprintf oc "%d" 00000000000000000000000000001110;
+    fprintf oc "%x" 14;
+    fprintf oc "%x" 0;
+    fprintf oc "%x" 0;
+    fprintf oc "%x" 0;
     print_um_expr p;
     )
 and print_um_cmds cmd =

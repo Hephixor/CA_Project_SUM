@@ -95,7 +95,8 @@ public class UMRunner {
 		board = program[currentIndex++];
 		//Switch to operator section
 		code = board>>>28;
-
+		
+		System.out.println("Code op : " + code);
 		//Standard operator
 		if (code < 13) {
 			regA = (byte) ((board & 448) >>> 6);// Mask 0000000000000000000111000000
