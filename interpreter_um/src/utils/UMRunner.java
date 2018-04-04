@@ -1,11 +1,11 @@
 package utils;
 
-import java.io.FileNotFoundException;
+//import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
+//import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,12 +69,12 @@ public class UMRunner {
             operations.put(op.getOperationCode(),op);
         }
 
-		try {
-			//fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/test.umz");
-			fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/out.txt");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			//fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/test.umz");
+//			//fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/out.txt");
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	//Retrieve machine running/stopped
@@ -250,7 +250,7 @@ public class UMRunner {
 				throw new InstructionException("Value must be between 0 - 255" );
 			}
 			try {
-				byte[] strToBytes = BigInteger.valueOf(registers[regC]).toByteArray();
+				//byte[] strToBytes = BigInteger.valueOf(registers[regC]).toByteArray();
 			   // fileOutputStream.write(strToBytes);
 				outputStream.write((char) registers[regC]);
 				outputStream.flush();

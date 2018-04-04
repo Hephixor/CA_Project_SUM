@@ -1,6 +1,6 @@
 open Ast
 open Printf
-let oc = open_out "../data/outUM.um"
+let oc = open_out_bin "../data/outUM.um"
 
 let rec print_um_expr e =
 match e with
