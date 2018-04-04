@@ -34,12 +34,6 @@ import javafx.stage.Stage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-/**
- * Application de découpe et de fusion de fichiers
- * @author William Sergeant, Romain Coispel
- *
- */
-
 public class Main extends Application {
 	UMInitializerThread sp = null;
 	Runnable mf = null;
