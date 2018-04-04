@@ -23,9 +23,10 @@ public class UMInitializer {
 		}
 		in.close();
 		byte bytes[] = byteArray.toByteArray();
-//		if (bytes.length % 4 != 0) {
-//			throw new WordException("Exception while reading word");
-//		} 
+		
+		if (bytes.length % 4 != 0) {
+			throw new WordException("Exception while reading word");
+		} 
 
 		int chunks[] = new int[bytes.length / 4];
 		for (int i = 0; i < chunks.length; i++) {

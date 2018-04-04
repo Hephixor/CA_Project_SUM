@@ -21,7 +21,7 @@ make
 There is an *Ant Build* file in the um/ directory that you can run with command `ant createjar`, you need to have *Ant* installed on your machine.
 ```
 cd um
-ant createjar
+ant create_run_jar
 ```
 
 
@@ -55,8 +55,5 @@ There are several routines you can call with scripts placed in tests/ folder.
 
 ```
 cd tests
-./testscript.sh
+./testscript_name.sh
 ```
-
-todo
-let variable

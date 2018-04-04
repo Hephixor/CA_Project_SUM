@@ -3,11 +3,11 @@ open Printf
 open Bytes
 let oc = open_out_bin "../data/outUM.um"
 
-let specOp oc a n =
-  output_byte oc ((13 lsl 4) lor ((a lsl 1) lor (n lsr 24) ) );
-  output_byte oc ((n lsl 8) lsr 24);
-  output_byte oc ((n lsl 16) lsr 24);
-  output_byte oc ((n lsl 24) lsr 24)
+let specOp oc a reg =
+  output_byte oc ((13 lsl 4) lor ((a lsl 1) lor (reg lsr 24)));
+  output_byte oc ((reg lsl 8) lsr 24);
+  output_byte oc ((reg lsl 16) lsr 24);
+  output_byte oc ((reg lsl 24) lsr 24)
 
 let standOp oc op a b c =
   output_byte oc (op lsl 4);
@@ -16,14 +16,14 @@ let standOp oc op a b c =
   output_byte oc (((a lsl 30) lsr 24) lor ((b lsl 3) lor c))
 
 let print oc s =
-  let rec aux i =
+  let rec encode i =
     if i<(String.length s) then
-      let n = Char.code (String.get s i) in
-      specOp oc 0 n;
+      let len = Char.code (String.get s i) in
+      specOp oc 0 len;
       standOp oc 10 0 0 0;
-      aux (i+1)
+      encode (i+1)
   in
-  aux 0;
+  encode 0;
   specOp oc 0 10;
   standOp oc 10 0 0 0
 

@@ -1,20 +1,21 @@
-package utils;
+package src;
 
-//import java.io.FileNotFoundException;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-//import java.math.BigInteger;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import exceptions.InstructionException;
+import utils.OperationCodes;
 
-public class UMRunner {
-
+public class UMRunnerThread implements Runnable{
+	
 	//Universal Machine structure
 	private boolean isRunning = false;
 	private int currentIndex;
@@ -23,23 +24,23 @@ public class UMRunner {
 	private ArrayList<int[]> collections = new ArrayList<int[]>();
 	private ArrayList<Integer> boards = new ArrayList<Integer>();
 	private InputStream inputStream = System.in;
-
+	
 	private OutputStream outputStream = System.out;
 	final Map<Integer, OperationCodes> operations = new HashMap<Integer, OperationCodes>();
-
-
+	
+	
 	FileOutputStream fileOutputStream ;
-
-
-	//Retrieve current board instruction
+	
+	
+	//Retrieve current board instruction 
 	private int code;
 	private int regval;
 	private int board;
 	private byte regA;
 	private byte regB;
 	private byte regC;
-
-	//Enum ?
+	
+	//Enum ? 
 //    final byte CONDITIONAL_MOVE = 0;
 //    final byte ARRAY_INDEX = 1;
 //    final byte ARRAY_MODIFICATION = 2;
@@ -54,11 +55,10 @@ public class UMRunner {
 //    final byte TYPE_IN = 11;
 //    final byte LOAD_PROGRAM = 12;
 //    final byte SPELL = 13;
+	
+	
 
-
-
-	public UMRunner(int[] program) {
-		this.isRunning=false;
+	public UMRunnerThread(int[] program) {
 		this.program = new int[program.length];
 		//Initial array reservation
 		this.collections.add(null);
@@ -68,20 +68,21 @@ public class UMRunner {
 		for (OperationCodes op : OperationCodes.values()) {
             operations.put(op.getOperationCode(),op);
         }
-
-//		try {
-//			//fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/test.umz");
-//			//fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/out.txt");
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		}
-	}
-
+		
+		try {
+			fileOutputStream = new FileOutputStream("../data/out.txt");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		System.out.println("UMRunnerThread started.");
+		System.out.println("Writing to " + fileOutputStream.getChannel().toString());
+		}
+	
 	//Retrieve machine running/stopped
 	public boolean isRunning() {
 		return isRunning;
 	}
-
+	
 	//Turn on/off machine
 	public void toggleRunning() {
 		if(isRunning == true) isRunning = false;
@@ -90,20 +91,18 @@ public class UMRunner {
 
 	//Match operator code with operator type and capture registers A,B,C from current board
 	public void getNextInstruction() {
-		//System.out.println("currentIndex "+currentIndex);
 		//Go to next board
 		board = program[currentIndex++];
 		//Switch to operator section
 		code = board>>>28;
-		
-		System.out.println("Code op : " + code);
+
 		//Standard operator
 		if (code < 13) {
 			regA = (byte) ((board & 448) >>> 6);// Mask 0000000000000000000111000000
 			regB = (byte) ((board & 56) >>> 3); // Mask 0000000000000000000000111000
 			regC = (byte) (board & 7); 			// Mask 0000000000000000000000000111
 			regval = 0;
-		}
+		} 
 
 		//Special operator
 		else {
@@ -114,15 +113,14 @@ public class UMRunner {
 		}
 	}
 
-	public void executeInstruction() throws InstructionException {
+	public void run() {
 		//Retrieving next instruction code
 		getNextInstruction();
 		int array[];
-
+		
 		//Map code to instruction
 		OperationCodes operation = OperationCodes.getOperationFromCode(code);
-		if(operation == null) System.out.println("operation = null" + code);
-		else{
+		
 		switch (operation) {
 /* BASIC OPERATORS */
 //			#0. Conditional Move.
@@ -184,7 +182,7 @@ public class UMRunner {
 //	           each quantity is treated treated as an unsigned 32
 //	           bit number.
 		case DIV:
-			registers[regA] = (int) ((registers[regB] & 0xFFFFFFFFL) / (registers[regC] & 0xFFFFFFFFL)); //Mask 11111111111111111111111111111111 unsigned
+			registers[regA] = (int) ((registers[regB] & 0xFFFFFFFFL) / (registers[regC] & 0xFFFFFFFFL));
 			break;
 // ---------------------------------------------------------------------
 //			#6. Not-And.
@@ -194,9 +192,9 @@ public class UMRunner {
 //            position.  Otherwise the bit in register A receives
 //            the 0 bit.
 		case NOT_AND:
-			registers[regA] = ~(registers[regB] & registers[regC]); // Flipping bits
+			registers[regA] = ~(registers[regB] & registers[regC]);
 			break;
-// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------			
 /* OTHER OPERATORS */
 //			 #7. Halt.
 //
@@ -219,11 +217,11 @@ public class UMRunner {
 				collections.add(newCollection);
 				registers[regB] = collections.size() - 1;
 			} else {
-				int lo = boards.size() - 1;
-				int i = ((Integer) boards.get(lo)).intValue();
+				int fi = boards.size() - 1;
+				int i = ((Integer) boards.get(fi)).intValue();
 				int[] newCollection = new int[registers[regC]];
 				collections.set(i,newCollection);// setElementAt(new int[registers[regC]], i);
-				boards.remove(lo);
+				boards.remove(fi);
 				registers[regB] = i;
 			}
 			break;
@@ -234,7 +232,11 @@ public class UMRunner {
 //            Future allocations may then reuse that identifier.
 		case ABANDON:
 			if (registers[regC] == 0) {
-				throw new InstructionException("RegC = 0 , ABANDON of array 0 forbidden");
+				try {
+					throw new InstructionException("Cannot abandon the zero array");
+				} catch (InstructionException e) {
+					e.printStackTrace();
+				}
 			}
 			collections.set(registers[regC], null);
 			int newBoard = new Integer(registers[regC]);
@@ -248,11 +250,15 @@ public class UMRunner {
 //            are allowed.
 		case PRINT_OUT:
 			if (registers[regC] > 255) {
-				throw new InstructionException("Value must be between 0 - 255" );
+				try {
+					throw new InstructionException("Output too large");
+				} catch (InstructionException e) {
+					e.printStackTrace();
+				}
 			}
 			try {
-				//byte[] strToBytes = BigInteger.valueOf(registers[regC]).toByteArray();
-			   // fileOutputStream.write(strToBytes);
+				byte[] strToBytes = BigInteger.valueOf(registers[regC]).toByteArray();
+			    fileOutputStream.write(strToBytes);
 				outputStream.write((char) registers[regC]);
 				outputStream.flush();
 			} catch (IOException e1) {
@@ -293,8 +299,8 @@ public class UMRunner {
 		case LOAD_PROGRAM:
 			if (registers[regB] != 0) {
 				int prog[] = (int[]) collections.get(registers[regB]);
-				//program = new int[prog.length];
-				program = Arrays.copyOf(prog, prog.length);
+				program = new int[prog.length];
+				System.arraycopy(prog, 0, program, 0, prog.length);
 			}
 			currentIndex = registers[regC];
 			break;
@@ -309,8 +315,11 @@ public class UMRunner {
 			break;
 
 		default:
-			throw new InstructionException("Invalid instruction");
-		}
+			try {
+				throw new InstructionException("Invalid instruction");
+			} catch (InstructionException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 // ---------------------------------------------------------------------
