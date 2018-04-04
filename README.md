@@ -1,6 +1,6 @@
 # Universal Machine
 
-[travis-image]
+![Hephixor on Travis CI][travis-image]
 
 [travis-image]: http://www.boundvariable.org/spec.png
 
