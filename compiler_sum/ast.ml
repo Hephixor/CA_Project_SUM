@@ -1,20 +1,23 @@
-type op = Add | Mul | Sub | Div | Not | And | Or | Eq | Lt | True | False | None_op
+type op = Add | Mul | Sub | Div | Not | And | Or | Eq | Lt | Gt | Loe | Goe | True | False | None_op
 type tprim = INT | BOOL | None_tprim
-type kw = Echo | Const | None_kw
+type kw = Echo | Const | Scan | None_kw
 
 let string_of_op op =
 match op with
-Add -> "add"
-| Mul -> "mul"
-| Sub -> "sub"
-| Div -> "div"
+Add -> "+"
+| Mul -> "*"
+| Sub -> "-"
+| Div -> "/"
 | True -> "true"
 | False -> "false"
 | Not -> "not"
 | And -> "and"
 | Or -> "or"
 | Eq -> "eq"
-| Lt -> "lt"
+| Lt -> "<"
+| Gt -> ">"
+| Loe -> "<="
+| Goe -> ">="
 | None_op -> ""
 
 
@@ -34,8 +37,8 @@ match sp with
 
 let string_of_kw kw =
 match kw with
-Echo -> "echo"
-| Const -> "const"
+Echo -> "print"
+| Const -> "let"
 | None_kw -> ""
 let kw_of_string kw =
 match kw with
@@ -45,22 +48,24 @@ match kw with
 
 let op_of_string op =
 match op with
-"add" -> Add
-| "mul" -> Mul
-| "sub" -> Sub
-| "div" -> Div
+"+" -> Add
+| "*" -> Mul
+| "-" -> Sub
+| "/" -> Div
 | "true" -> True
 | "false" -> False
 | "not" -> Not
 | "and" -> And
 | "or" -> Or
 | "eq" -> Eq
-| "lt" -> Lt
+| "<" -> Lt
+| ">" -> Gt
+| "<=" -> Loe
+| ">=" -> Goe
 | _ -> None_op
 
 type typ =
  ASTTyprim of tprim
-|ASTTyfun of typ list * typ
 
 type expr =
 ASTNum of int
@@ -68,20 +73,11 @@ ASTNum of int
 | ASTBool of bool
 | ASTUnary of op * expr
 | ASTPrim of op * expr * expr
-| ASTApp of expr * exprs
 | ASTIf of expr * expr * expr
-| ASTAbstr of args * expr
+| ASTScan of string
 and exprs =
 ASTExpres of expr
 | ASTExprs of expr * exprs
-and arg =
-ASTArgument of string * typ
-and args =
-ASTArg of arg
-| ASTArgs of arg * args
-
-
-
 
 
 type stat =
@@ -89,8 +85,6 @@ ASTEcho of expr
 
 type dec =
 ASTConst of string * typ * expr
-|ASTFun of string * typ * args * expr
-|ASTFRec of string * typ * args * expr
 
 type cmds =
 ASTStat of stat
