@@ -1,5 +1,7 @@
 # Universal Machine
 
+[travis-image]
+
 [travis-image]: http://www.boundvariable.org/spec.png
 
 Universal Machine compiler and interpreter project
