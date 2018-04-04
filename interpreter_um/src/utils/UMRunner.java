@@ -70,8 +70,8 @@ public class UMRunner {
         }
 
 		try {
-			//fileOutputStream = new FileOutputStream("C:\\Users\\Hephixor\\workspace-java\\Universal_Machine\\test.umz");
-			fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/out.um");
+			//fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/test.umz");
+			fileOutputStream = new FileOutputStream("/users/Etu9/3200849/workspace/MSTL/CA/Universal_Machine/out.txt");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -183,7 +183,7 @@ public class UMRunner {
 //	           each quantity is treated treated as an unsigned 32
 //	           bit number.
 		case DIV:
-			registers[regA] = (int) ((registers[regB] & 0xFFFFFFFFL) / (registers[regC] & 0xFFFFFFFFL)); //Mask 11111111111111111111111111111111 non signé
+			registers[regA] = (int) ((registers[regB] & 0xFFFFFFFFL) / (registers[regC] & 0xFFFFFFFFL)); //Mask 11111111111111111111111111111111 unsigned
 			break;
 // ---------------------------------------------------------------------
 //			#6. Not-And.
@@ -218,11 +218,11 @@ public class UMRunner {
 				collections.add(newCollection);
 				registers[regB] = collections.size() - 1;
 			} else {
-				int fi = boards.size() - 1;
-				int i = ((Integer) boards.get(fi)).intValue();
+				int lo = boards.size() - 1;
+				int i = ((Integer) boards.get(lo)).intValue();
 				int[] newCollection = new int[registers[regC]];
 				collections.set(i,newCollection);// setElementAt(new int[registers[regC]], i);
-				boards.remove(fi);
+				boards.remove(lo);
 				registers[regB] = i;
 			}
 			break;
@@ -233,7 +233,7 @@ public class UMRunner {
 //            Future allocations may then reuse that identifier.
 		case ABANDON:
 			if (registers[regC] == 0) {
-				throw new InstructionException("RegC = 0 , ABANDON forbidden");
+				throw new InstructionException("RegC = 0 , ABANDON of array 0 forbidden");
 			}
 			collections.set(registers[regC], null);
 			int newBoard = new Integer(registers[regC]);

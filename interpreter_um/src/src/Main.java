@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import utils.UMInitializer;
 import utils.UMRunner;
-import entities.UniversalMachine;
 import exceptions.InstructionException;
 import exceptions.WordException;
 import javafx.application.Application;
@@ -589,8 +588,6 @@ public class Main extends Application {
 		btn2_2.setOnAction((event) -> {
 
 
-			ExecutorService pool = Executors.newFixedThreadPool(2);
-
 			if(program!=null){
 
 				UMRunner umr = new UMRunner(program);
@@ -600,26 +597,14 @@ public class Main extends Application {
 					try {
 						umr.executeInstruction();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 
 				}while(umr.isRunning());
-
-				//				mf = new UMRunnerThread(program);
-				//				try {
-				//					pool.submit(mf);
-				//					pool.shutdown();
-				//					pool.awaitTermination(5, TimeUnit.SECONDS);
-				//				}
-				//				catch (InterruptedException e) {
-				//					System.err.println("tasks interrupted");
-				//				}
 			}
 			else{
 				//Programme non chargé
-				//System.out.println(this.program.length);
-				System.out.println("Impossible : Programme non chargé");
+				System.out.println("Impossible : No UM program loaded");
 			}
 
 

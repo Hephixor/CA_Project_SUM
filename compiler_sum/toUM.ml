@@ -1,6 +1,6 @@
 open Ast
 open Printf
-let oc = open_out "../outUM.um"
+let oc = open_out "../data/outUM.um"
 
 let rec print_um_expr e =
 match e with
@@ -145,7 +145,7 @@ ASTProg ppp -> (
 let _ =
 try
 
-let ic = open_in "../sum.txt" in
+let ic = open_in "../data/sum.sum" in
   let n = in_channel_length ic in
   let lines = Bytes.create n in
   really_input ic lines 0 n;

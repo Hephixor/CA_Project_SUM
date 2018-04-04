@@ -18,8 +18,8 @@ rule token = parse
 | "or" as op { BINOP(op) }
 | "eq" as op { BINOP(op) }
 | "lt" as op { BINOP(op) }
-| "ECHO" as kw { ECHO(kw) }
-| "CONST" { CONST }
+| "print" as kw { ECHO(kw) }
+| "let" { CONST }
 | "FUN" { FUN }
 | "REC" { REC }
 | "int" { INT }
