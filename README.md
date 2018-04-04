@@ -57,3 +57,6 @@ There are several routines you can call with scripts placed in tests/ folder.
 cd tests
 ./testscript.sh
 ```
+
+todo
+let variable

@@ -1,129 +1,73 @@
 open Ast
 open Printf
+open Bytes
 let oc = open_out_bin "../data/outUM.um"
+
+let opSpeciaux oc a n =
+  output_byte oc ( (13 lsl 4) lor ( (a lsl 1) lor (n lsr 24) ) );
+  output_byte oc ( (n lsl 8) lsr 24);
+  output_byte oc ( (n lsl 16) lsr 24);
+  output_byte oc ( (n lsl 24) lsr 24)
+
+let opStandards oc op a b c =
+  output_byte oc (op lsl 4);
+  output_byte oc 0;
+  output_byte oc (a lsr 2);
+  output_byte oc (((a lsl 30) lsr 24) lor ( (b lsl 3) lor c))
+
+let print oc s =
+  let rec aux i =
+    if i<(String.length s) then
+      let n = Char.code (String.get s i) in
+      opSpeciaux oc 0 n;
+      opStandards oc 10 0 0 0;
+      aux (i+1)
+  in
+  aux 0;
+  opSpeciaux oc 0 10;
+  opStandards oc 10 0 0 0
+
+
 
 let rec print_um_expr e =
 match e with
-ASTNum n -> fprintf oc "%d" n
-| ASTId x -> fprintf oc  "%s" x
-| ASTBool x -> fprintf oc "\"%b\"" x
-| ASTUnary(op, e) -> (
-  fprintf oc "%s" (string_of_op op);
-  fprintf oc "( ";
-  print_um_expr e;
-  fprintf oc ") "
-  )
-| ASTPrim(op, e1, e2) -> (
-    fprintf oc  "%s" (string_of_op op);
-    fprintf oc "( ";
-    print_um_expr e1;
-    fprintf oc ", ";
-    print_um_expr e2;
-    fprintf oc ") "
-    )
-| ASTApp(e1,e2) -> (
-  fprintf oc "app(";
-  print_um_expr e1;
-  fprintf oc  ",";
-  print_um_exprs e2;
-  fprintf oc ")"
-  )
-| ASTIf(e1,e2,e3) -> (
-  fprintf oc "if";
-  fprintf oc  "( ";
-  print_um_expr e1;
-  fprintf oc  ", ";
-  print_um_expr e2;
-  fprintf oc  ", ";
-  print_um_expr e3;
-  fprintf oc  ") "
-  )
-| ASTAbstr (ar,ex) -> (
-   fprintf oc  "abstr([ ";
-   print_um_args ar;
-   fprintf oc  " ],";
-   print_um_expr ex;
-   fprintf oc ")"
-  )
+ASTNum n ->  n
+| ASTId x -> int_of_string x
+| ASTBool x -> 0
+| ASTUnary(op, e) -> 0
+| ASTPrim(op, e1, e2) -> 0
+| ASTApp(e1,e2) -> 0
+| ASTIf(e1,e2,e3) -> 0
+| ASTAbstr (ar,ex) -> 0
 and print_um_dec d =
   match d with
-  ASTConst(ide, ty, x) -> (
-      fprintf oc "const(%s" ide;
-      fprintf oc ", ";
-      print_um_typ ty;
-      fprintf oc ", ";
-      print_um_expr x;
-      fprintf oc ") ";
-      )
-  | ASTFun(ide,ty,args,expr) -> (
-    fprintf oc "fun(%s, [" ide;
-    print_um_args args;
-    fprintf oc "], ";
-    print_um_typ ty;
-    fprintf oc ", ";
-    print_um_expr expr;
-    fprintf oc " ) "
-    )
-  | ASTFRec(ide,ty,args,expr) -> (
-    fprintf oc "funrec(%s, [" ide;
-    print_um_args args;
-    fprintf oc "] , ";
-    print_um_typ ty;
-    fprintf oc " , [ ";
-    print_um_expr expr;
-    fprintf oc " ]) "
-    )
+  ASTConst(ide, ty, x) -> 0
+  | ASTFun(ide,ty,args,expr) -> 0
+  | ASTFRec(ide,ty,args,expr) -> 0
 and print_um_exprs es =
   match es with
   | ASTExpres e -> print_um_expr e
-  | ASTExprs(e, e') ->(
-    print_um_expr e;
-    print_um_exprs e')
+  | ASTExprs(e, e') ->0
 and print_um_arg s =
   match s with
-  ASTArgument(s,t) ->(
-    fprintf oc " (%s," s;
-    print_um_typ t;
-    fprintf oc ") "
-    )
+  ASTArgument(s,t) ->0
 and print_um_args ags =
   match ags with
    ASTArg(s) -> print_um_arg s
-  | ASTArgs(s, s') -> (
-    print_um_arg s;
-    fprintf oc  ", ";
-    print_um_args s'
-  )
+  | ASTArgs(s, s') -> 0
   and print_um_typ t =
     match t with
-    ASTTyprim t ->(
-        fprintf oc "%s" (string_of_tprim t)
-        )
-    | ASTTyfun(ts,t) -> (
-        fprintf oc " fleche([";
-        print_um_typs ts;
-        fprintf oc "], ";
-        print_um_typ t;
-        fprintf oc ") "
-      )
+    ASTTyprim t -> 0
+    | ASTTyfun(ts,t) -> 0
   and print_um_typs ts =
     match ts with
-       [] -> ()
+       [] -> 0
       |t::[] -> print_um_typ t
-      | t::ts -> (
-        print_um_typ t;
-        fprintf oc ", ";
-        print_um_typs ts
-        )
-
+      | t::ts -> 0
 and print_um_stat p =
   match p with
   ASTEcho p -> (
-    fprintf oc "%x" 14;
-    fprintf oc "%x" 0;
-    fprintf oc "%x" 0;
-    fprintf oc "%x" 0;
-    print_um_expr p;
+    print oc (string_of_int (print_um_expr p))
     )
 and print_um_cmds cmd =
 match cmd with
@@ -131,12 +75,10 @@ match cmd with
   print_um_stat cmd;
   )
 |ASTStatCmds (c,m) ->(
-  print_um_stat c;
-  fprintf oc " , ";
-  print_um_cmds m)
+  )
 |ASTDecCmds (cmd,a) -> (
   print_um_dec cmd;
-  fprintf oc " , ";
+
   print_um_cmds a
   )
 and print_um_prog ppp =
